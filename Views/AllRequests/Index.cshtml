@@ -1,0 +1,256 @@
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@model IEnumerable<SiparisTakip.Models.Tables.Request>
+@{
+    ViewData["Title"] = "Tüm İstekler";
+}
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Tüm Talepler</h3>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_title text-right">
+                        @Html.ActionLink("Yeni Talep Oluştur", "Index", "NewRequest", null, new { @class = "btn  btn-dark mr-2" })
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card-box table-responsive">
+
+                                    <table id="datatable" class="table table-striped table-bordered" style="width:100%; text-align:center">
+
+                                        <thead>
+                                            <tr class="align-middle">
+                                                <th class="align-middle">Ürün Resmi</th>
+                                                <th class="align-middle">Talep Oluşturan Üye</th>
+                                                <th class="align-middle">Talep Numarası</th>
+                                                <th class="align-middle">Talep Eden Departman</th>
+                                                <th class="align-middle">Talep Eden Personel</th>
+                                                <th class="align-middle">Proje</th>
+                                                <th class="align-middle">Gider Yeri</th>
+                                                <th class="align-middle">Cinsi</th>
+                                                <th class="align-middle">Ürün Özellikleri</th>
+                                                <th class="align-middle">Açıklama</th>
+                                                <th class="align-middle">Miktar</th>
+                                                <th class="align-middle">Tahmini Fiyat</th>
+                                                <th class="align-middle">Teslim Tarihi</th>
+                                                <th class="align-middle">Tederaikçi Firmalar</th>
+                                                <th class="align-middle">PDF</th>
+                                                <th class="align-middle">Excel</th>
+                                                <th class="align-middle">Durum</th>
+                                                <th class="align-middle">Beklemeye Al</th>
+                                                <th class="align-middle">İşlem Yap</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @{ foreach (var item in Model)
+                                                {
+                                                    if (item.requestStatus != 2)
+                                                    {
+                                                                                        <tr class="align-middle">
+                                                                                            <td>
+                                                                                                <a href="images/@item.requestImage" data-fancybox="gallery-@item.requestNo" data-caption="Talep No : @item.requestNo">
+
+                                                                                                    <img src="images/@item.requestImage" style="width:50px; height:50px;" />
+                                                                                                </a>
+                                                                                            </td>
+                                                                                            <td class="align-middle">@item.user.userName &nbsp; @item.user.userSurname</td>
+                                                                                            <td class="align-middle">@item.requestNo</td>
+                                                                                            <td class="align-middle">@item.requestDepartment</td>
+                                                                                            <td class="align-middle">@item.requestSteff</td>
+                                                                                            <td class="align-middle">@item.requestProject</td>
+                                                                                            <td class="align-middle">@item.requestExpensePlace</td>
+                                                                                            <td class="align-middle">@item.requestSpecies</td>
+                                                                                            <td class="align-middle">@item.requestProductFeatures</td>
+                                                                                            <td class="align-middle">@item.requestDescription</td>
+                                                                                            <td class="align-middle">@item.requestQuantity</td>
+                                                                                            <td class="align-middle">@item.requestEstimatedPrice</td>
+                                                                                            <td class="align-middle">@item.requestDeliveryDate</td>
+                                                                                            <td class="align-middle">@item.requestSupplyCompany1 <br> @item.requestSupplyCompany2 <br>@item.requestSupplyCompany3 </td>
+
+                                                                                            <td class="align-middle">
+                                                                                                @{
+                                                                                                    if (item.requestPDF != "-")
+                                                                                                    {
+                                                                                                        <a target="_blank" href="~/pdf/@item.requestPDF" class="btn btn-danger btn-sm">PDF</a>
+                                                                                                    } else
+                                                                                                    {
+                                                                                                        <span>PDF Eklenmedi</span>
+                                                                                                    }
+                                                                                                }
+                                                                                            </td>
+                                                                                            <td class="align-middle">
+                                                                                                @{
+                                                                                                    if (item.requestExcel != "-")
+                                                                                                    {
+                                                                                                        <a target="_blank" href="~/excel/@item.requestExcel" class="btn btn-success btn-sm">Excel</a>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        <span>Excel Eklenmedi</span>
+                                                                                                    }
+                                                                                                }
+                                                                                            </td>
+                                                                                            <td class="align-middle">
+                                                                                                @{ if (item.requestStatus == 1)
+                                                                                                    {
+                                                                                                        <p>Onaylandı</p>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        <p>Beklemede</p>
+                                                                                                    }
+
+                                                                                                }
+                                                                                            </td>
+                                                                                            <td class="align-middle">
+                                                                                                @{ if (item.requestStatus == 1)
+                                                                                                    {
+                                                                                                        @Html.ActionLink("Beklemeye Al", "StatusEdit", "Request", new { id = item.requestId }, new { @class = "btn btn-sm btn-dark" })
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        @Html.ActionLink("Onayla", "StatusEdit", "Request", new { id = item.requestId }, new { @class = "btn btn-success" })
+                                                                                                    }
+
+                                                                                                }
+                                                                                            </td>
+                                                                                            <td class="align-middle">
+                                                                                                @Html.ActionLink("Düzenle", "Index", "EditRequest", new { id = item.requestId }, new { @class = "btn btn-warning" })
+                                                                                                <button onclick="deleteItem(@item.requestId)" class="btn btn-danger" type="button">Sil</button>
+
+                                                                                            </td>
+                                                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                        <tr class="align-middle text-white bg-danger">
+                                            <td><img src=" /images/@item.requestImage" style="width:50px; height:50px;"></td>
+                                            <td class="align-middle">@item.user.userName &nbsp; @item.user.userSurname</td>
+                                            <td class="align-middle">@item.requestNo</td>
+                                            <td class="align-middle">@item.requestDepartment</td>
+                                            <td class="align-middle">@item.requestSteff</td>
+                                            <td class="align-middle">@item.requestProject</td>
+                                            <td colspan="12" class="align-middle">Silinme Nedeni: @item.requestDeleteDescription</td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+                                            <td style="display:none"></td>
+
+
+                                            <td><button onclick="bringBack(@item.requestId)" class="btn btn-info text-white" type="button">Geri Getir</button></td>
+                                        </tr>
+
+                                            }
+                                            }
+                                            }
+</tbody>
+                                        </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+<script>
+
+    function bringBack(id) {
+         let postData = {
+                'id': id
+            }
+            $.ajax({
+                type: "post",
+                data:postData,
+            headers: {
+                "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+            },
+            url: '@Url.Action("BringBack", "AllRequests")',
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result == "success") {
+                        location.reload();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Geri alma işlemi',
+                            text: 'Geri alma işlemi yapılırken bir hata oluştur...'
+                        })
+                    }
+            }
+        });
+    }
+
+
+    async function deleteItem(id) {
+
+        const { value: text } = await Swal.fire({
+            input: 'textarea',
+            inputPlaceholder: 'Neden siliyorsunuz? ',
+            inputAttributes: {
+                'aria-label': 'Neden siliyorsunuz? '
+            },
+            showCancelButton: true
+        })
+
+        if (text) {
+           // Swal.fire(text)
+            let postData = {
+                'id': id,
+                'requestDeleteDescription': text
+            }
+            $.ajax({
+                type: "post",
+                data:postData,
+            headers: {
+                "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+            },
+            url: '@Url.Action("Delete", "AllRequests")',
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result == "success") {
+                        location.reload();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Silme işlemi',
+                            text: 'Silme işlemi yapılırken bir hata oluştur...'
+                        })
+                    }
+            }
+        });
+        }
+
+
+
+    }
+
+</script>
